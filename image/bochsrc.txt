@@ -12,7 +12,7 @@ vgaromimage: file=$BXSHARE/VGABIOS-lgpl-latest
 
 # what disk images will be used 
 # 配置镜像名
-floppya: 1_44=./image/zzxOS.img, status=inserted
+floppya: 1_44=zzxOS.img, status=inserted
 
 # choose the boot disk.
 boot: a

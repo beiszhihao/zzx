@@ -74,6 +74,7 @@ PROTECT_BEGIN:
 mov ax , 16
 mov ds , ax
 mov es,ax
+mov ss,ax
 JMP        0x8200
 gdt:
     dw  0,0,0,0 ;/*Empty descriptor, reserved*/
