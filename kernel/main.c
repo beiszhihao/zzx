@@ -7,10 +7,11 @@
  */
 #include "output.h"
 #include "string.h"
+#include "stdlib.h"
 int main(){
-	char* str = "love to ixsy";
-	char *stu = "love to to to";
-	strcpy(stu,str);
-	__print(stu,strlen(stu),0x000f,0);
+	char str[10] = {0};
+	itoa(123,str,10);
+	char *s = "sd";
+	__print(str,strlen(str),0x000f,0);
 	for(;;);
 }

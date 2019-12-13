@@ -17,5 +17,5 @@ ifeq ($(OS), debian)
 else ifeq ($(OS), macos)
 	@echo macos path comple make
 	@i386-elf-gcc -c main.c -o ../temp/main.o -I "../text" -I "../sd" -I "../c"
-	@i386-elf-ld ../temp/main.o ../bin/output.bin ../bin/string.bin -o ../temp/main.bin -T kn.ld
+	@i386-elf-ld ../temp/main.o ../bin/output.bin ../bin/string.bin ../bin/stdlib.bin -o ../temp/main.bin -T kn.ld
 endif
