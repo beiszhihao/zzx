@@ -38,6 +38,19 @@ int main(){
 }
 
 /*处理键盘部分*/
+char file[256] = {0};
+int index1;
+void s1(){
+    __print("zzxOS\nver:0x00000000\n");
+}
+void s2(){
+    __print("ld:no file\n");
+    
+}
+void s3(){
+    __print("error:no comd\n");
+    
+}
 void int21(int *esp){
     unsigned char data[28][2] = {
        0x1e,'a',
@@ -73,8 +86,27 @@ void int21(int *esp){
 	get = __io_in8(0x60);
     for(int i = 0;i<28;++i){
     if(get == data[i][0]){
+	if(get == 0x1c){
+        __print("\n");
+		if(strcmp(file,"help") == 0){
+            /*call*/
+            s1();
+            
+		}else if(strcmp(file,"ls") == 0){
+            
+            s2();
+        }else{
+            
+            s3();
+        }
+        memset(file,0,strlen(file));
+        index1 = 0;
+        __print("$:");
+		break;
+	}
         char str[4] = {0};
         str[0] = data[i][1];
+	file[index1++] = data[i][1];
         __print(str);
     }
     }
