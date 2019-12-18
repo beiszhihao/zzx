@@ -6,6 +6,9 @@ system:
 	@make -C ./test
 	@make -C ./text
 	@make -C ./c
-	@make -C ./kernel OS=macos
+	@make -C ./int
+	@make -C ./pic
+	@make -C ./io
+	@make -C ./kernel
 	@make -C ./image
 	@echo "comple ok"

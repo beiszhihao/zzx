@@ -25,4 +25,5 @@ mouse: enabled=0
 
 # enable key mapping, using US layout as default.
 # 键盘的映射方式也改变了
+#keyboard_mapping: enabled=1, map=$BXSHARE/keymaps/x11-pc-us.map
 keyboard: keymap=$BXSHARE/keymaps/x11-pc-us.map

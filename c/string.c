@@ -5,7 +5,7 @@
  *1.26
  *
  */
-#include "macro.h"
+#include "stdder.h"
 
 int strlen(const char *str){
 

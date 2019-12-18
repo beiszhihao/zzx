@@ -1,21 +1,12 @@
 
-OS := macos
-
 main: main.o
 
-ifeq ($(OS), debian)
-	@objcopy -S -O binary ../temp/main.bin ../bin/main.bin
-	@echo debian comple ok
-else ifeq ($(OS), macos)
 	@i386-elf-objcopy -S -O binary ../temp/main.bin ../bin/main.bin
-	@echo macos comple ok
-endif
+
 main.o:main.c
-ifeq ($(OS), debian)
-	@echo debian path comple make
-	@gcc -Wall main.c -o ../temp/main.o
-else ifeq ($(OS), macos)
-	@echo macos path comple make
-	@i386-elf-gcc -c main.c -o ../temp/main.o -I "../text" -I "../sd" -I "../c"
-	@i386-elf-ld ../temp/main.o ../bin/output.bin ../bin/string.bin ../bin/stdlib.bin -o ../temp/main.bin -T kn.ld
-endif
+
+	@nasm -f elf ker_int.asm -o ../bin/ker_int.o
+	@echo compile: ker_int.c ok
+	@i386-elf-gcc -c main.c -o ../temp/main.o -I "../text" -I "../int" -I "../c" -I "../pic" -I "../io"
+	@echo compile: main.c ok
+	@i386-elf-ld ../temp/main.o ../bin/ker_int.o ../bin/io.o ../temp/idt.o ../temp/tb.o ../temp/8259a.o ../temp/pics.o ../bin/output.bin ../bin/string.bin ../bin/stdlib.bin -o ../temp/main.bin -T kn.ld
