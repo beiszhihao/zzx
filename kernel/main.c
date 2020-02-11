@@ -6,20 +6,19 @@
  *
  */
 #include "output.h"
-#include "string.h"
 #include "stdlib.h"
 #include "idt.h"
 #include "8259a.h"
 #include "io.h"
 
-extern void asm_int21(void);
-extern void int21(int *esp);
+extern void _int_key_21(void);
+extern void _int_kernel_key_21(int *esp);
 
 int main(){
     /*init idt*/
     __idt_init();
     /*set idt index*/
-    __set_idt(0x21,(int)asm_int21,8,0x008e);
+    __set_idt(0x21,(int)_int_key_21,8,0x008e);
     /*open init*/
     __open_init();
     /*初始化8529a电路*/
@@ -41,7 +40,7 @@ int main(){
 char file[256] = {0};
 int index1;
 void s1(){
-    __print("zzxOS\nver:0x00000000\n");
+   __print("zzxos\n");
 }
 void s2(){
     __print("ld:no file\n");
@@ -51,7 +50,7 @@ void s3(){
     __print("error:no comd\n");
     
 }
-void int21(int *esp){
+void _int_kernel_key_21(int *esp){
     unsigned char data[28][2] = {
        0x1e,'a',
        0x30,'b',
@@ -83,7 +82,7 @@ void int21(int *esp){
        0x1c,'\n'
        };
     unsigned char get = 0;
-	get = __io_in8(0x60);
+	get = __io_in(0x60);
     for(int i = 0;i<28;++i){
     if(get == data[i][0]){
 	if(get == 0x1c){
@@ -92,7 +91,7 @@ void int21(int *esp){
             /*call*/
             s1();
             
-		}else if(strcmp(file,"ls") == 0){
+		}else if(strcmp(file,"ld") == 0){
             
             s2();
         }else{
