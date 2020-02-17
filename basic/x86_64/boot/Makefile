@@ -15,8 +15,8 @@ OBJ_TEMP_PATH:=../../../temp
 
 all: bootloader.bin
 
-bootloader.bin : bootloader.s
-	@${ASSEM} bootloader.s -o ${OBJ_TEMP_PATH}/bootloader.o
+bootloader.bin : bootloader_x86.s
+	@${ASSEM} bootloader_x86.s -o ${OBJ_TEMP_PATH}/bootloader.o
 	@${LIN} ${OBJ_TEMP_PATH}/bootloader.o -o ${OBJ_BIN_PATH}/bootloader.bin -T ${LINK}
 	@${OBJ} ${OBJ_BIN_PATH}/bootloader.bin
 	@echo compile: boot.asm ok

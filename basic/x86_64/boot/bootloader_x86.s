@@ -1,7 +1,7 @@
 /*16 bit code*/
 .code16
 
-/*off*/
+/*偏移*/
 .set BaseOff,0x7c00
 .set KernelAdd,0x820
 
@@ -9,27 +9,27 @@
 .text
 main:
 
-/*set stack*/
+/*设置堆栈*/
     mov $0,%ax
     mov %ax,%ss
     mov $BaseOff,%sp
     mov %ax,%ds
 
-/*read sector*/
+/*读取扇区*/
 read_sector:
     mov $0,%ax
     mov %ax,%ss
     mov $BaseOff,%sp
     mov %ax,%ds
 
-/*set register*/
+/*设置寄存器*/
     mov $KernelAdd,%ax
     mov %ax,%es
     mov $0,%ch
     mov $0,%dh
     mov $3,%cl
 
-/*circular read sector*/
+/*循环读取扇区*/
 set_error:
     mov $0,%si
 read:
@@ -58,9 +58,9 @@ error:
     jmp error
 
 /*
- *Set the text display mode. This kernel does not use any graphics card or VBE
- *You can use VBE or other video card drivers before entering the protected mode
- *It is recommended to modify this code
+ *设置文本显示模式。此内核不使用任何图形卡或VBE
+ *在进入保护模式之前，您可以使用VBE或其他视频卡驱动程序
+ *建议修改此代码
  */
 
 set_txt_mode:
@@ -71,13 +71,13 @@ set_txt_mode:
     int $0x10
 
 /*
- *Protection mode. After this code is executed, BIOS cannot be used
- *The last jump code will jump to kernel state
+ *保护模式。执行此代码后，无法使用BIOS
+ *最后一个跳转代码将跳转到内核状态
  */
 
 protect_mode:
     cli
-    lgdt gdt_48
+    lgdt gdt_32
     in $0x92,%al
     or $0x02,%al
     out %al,$0x92
@@ -92,31 +92,32 @@ PROTECT_BEGIN:
     mov %ax,%es
     mov %ax,%ss
     jmp 0x8200
-gdt:
-    .word  0,0,0,0 ;/*Empty descriptor, reserved*/
-    ;/*Kernel code segment base address 0x0000, segment limit 4G*/
+
+gdt32:
+    .word  0,0,0,0 ;/*空描述符，保留*/
+    ;/*内核代码段基址0x0000，段限制4G*/
     .word 0xffff
     .word 0x0000
     .word 0x9a00
     .word 0x00cf
-    ;/*Kernel data segment base address 0x0000, segment limit 4G*/
+    ;/*内核数据段基址0x0000，段限制4G*/
     .word 0xffff
     .word 0x0000
     .word 0x9200
     .word 0x00cf
-    ;/*Data segment base address 0x0, segment limit 4G*/
+    ;/*数据段基址0x0，段限制4G*/
     .word 0xffff
     .word 0x0000
     .word 0x9a00
     .word 0x00cf
-    ;/*Kernel code segment base address 0x0, segment limit 4G*/
+    ;/*内核代码段基址0x0，段限制4G*/
     .word 0xffff
     .word 0x0000
     .word 0x9200
     .word 0x00cf
-gdt_48: ;/*Indicates the location and size of GDT*/
+gdt_32: ;/*指明GDT的位置和尺寸*/
     .word 0x800 ;/*MAX 0x800*/
-    .word gdt
+    .word gdt32
     .word 0
 
 .org 510 /* Skip to address 0x510. */
