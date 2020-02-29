@@ -10,10 +10,15 @@
 #include "idt.h"
 #include "8259a.h"
 #include "io.h"
-
+#include "stdio.h"
+#include "dspbkltl.h"
+#include "memory.h"
 extern void _int_key_21(void);
 extern void _int_kernel_key_21(int *esp);
-
+struct dd{
+    int yun;
+    int z;
+};
 int main(){
     /*init idt*/
     __idt_init();
@@ -26,7 +31,41 @@ int main(){
     /*开启8529a上键盘中断电路，否则idt无法响应cpu内部中断*/
     __open_pic_int(0x21,0xf9);
     __open_pic_int(0xa1,0xef);
-    
+    //检索当前可用内存
+    __print("currently available memory:\n");
+    struct memory_layout *ptr = (struct memory_layout *)E820_ADDR;
+    for(int j =0;j<ptr->block_max;++j){
+            __printk("Type:0x%x Addr:0x%x Leng:0x%x\n",ptr->block[j].type,
+                     ptr->block[j].base_addr_low,
+                     ptr->block[j].base_addr_low+ptr->block[j].length_low);
+    }
+    __print("\nmalloc demo:\n");
+    //初始化内核态的内存管理
+    if(_kinit() == NULL){
+        __print("init memnory error");
+    }
+    //为内核态分配内存
+    char *str = _kmalloc(10);
+    char *std = _kmalloc(20);
+    char *ste = _kmalloc(30);
+    //打印分配到的内存地址
+    __printk("str:0x%x\nstd:0x%x\nste:0x%x\n",str,std,ste);
+    //写值
+    //strcpy不会检查越界，需要注意写入的字节不能大于分配的字节
+    strcpy(str,"hello word");
+    strcpy(std,"hello word 20");
+    strcpy(ste,"hello word 30");
+    __printk("str:%s\nstd:%s\nste:%s\n",str,std,ste);
+    //释放,注意释放不是清空内存，只是把地址归还给内核，std指向的地址依然有效
+    //但是这块地址可能会被下一次的kmalloc分配走
+    //为了避免错乱尽可能的在使用完kfree函数后将指针置空
+    _kfree(str);
+    str = NULL;
+    _kfree(std);
+    std = NULL;
+    _kfree(ste);
+    ste = NULL;
+    __print("\ntty demo:\n");
     /*用户部分*/
     __print("hello word! zzxOS.\n");
     __print("$:");

@@ -1,5 +1,4 @@
 #include "../include/output.h"
-#include "string.h"
 static int dev_add = 0;
 static int str_num = 0;
 void ___setmv(int pos,int hight,int low){
@@ -68,6 +67,22 @@ bool __Print(char *str,int len,int color,int dev){
 	
 }
 
+/*
+ * 17岁boy博主修改优化
+ * 主页：https://blog.csdn.net/bjbz_cxy/
+ */
+
 bool __print(char *str){
+   
 	__Print(str,strlen(str),0x00ef,dev_add);
+}
+
+bool __printk(char *str, ...){
+    char str_ptr[256] = {0};
+    va_list argptr;
+    int cnt;
+    va_start(argptr, str);
+    cnt = vsprintf(str_ptr, str, argptr);
+    va_end(argptr);
+    __print(str_ptr);
 }

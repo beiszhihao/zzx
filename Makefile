@@ -2,6 +2,7 @@ export OS
 
 system:
 	@make -C ./c
+	@make -C ./lib
 	@make -C ./basic/x86_64/int
 	@make -C ./basic/x86_64/pic
 	@make -C ./basic/x86_64/io

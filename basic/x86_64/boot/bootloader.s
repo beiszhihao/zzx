@@ -5,6 +5,9 @@
 .set BaseOff,0x7c00
 .set KernelAdd,0x820
 
+/*标识符*/
+.set x64,0x00
+
 /*code*/
 .text
 main:
@@ -71,11 +74,52 @@ set_txt_mode:
     int $0x10
 
 /*
+ *获取物理内存信息，为操作系统内存管理做准备
+ */
+get_momony_txt:
+mov $0,%ax
+mov $0,%bx
+mov $0,%cx
+mov $0,%dx
+mov %ax,%es
+probe_memory:
+//对 0x8000 处的 32 位单元清零,即给位于 0x8000 处的
+//struct e820map 的结构域 nr_map 清零
+movl $0, 0x8000
+xorl %ebx, %ebx
+//表示设置调用 INT 15h BIOS 中断后,BIOS 返回的映射地址描述符的起始地址
+movw $0x8004, %di
+start_probe:
+movl $0xE820, %eax // INT 15 的中断调用参数
+//设置地址范围描述符的大小为 20 字节,其大小等于 struct e820map 的结构域 map 的大
+movl $20, %ecx
+//设置 edx 为 534D4150h (即 4 个 ASCII 字符“SMAP”),这是一个约定
+movl $0x534d4150, %edx
+//调用 int 0x15 中断,要求 BIOS 返回一个用地址范围描述符表示的内存段信息
+int $0x15
+//如果 eflags 的 CF 位为 0,则表示还有内存段需要探测
+jnc cont
+//探测有问题,结束探测
+movw $12345, (0x8000)
+jmp finish_probe
+cont:
+//设置下一个 BIOS 返回的映射地址描述符的起始地址
+addw $20, %di
+//递增 struct e820map 的结构域 nr_map
+incl 0x8000
+//如果 INT0x15 返回的 ebx 为零,表示探测结束,否则继续探测
+cmpl $0, %ebx
+jnz start_probe
+finish_probe :
+
+/*
  *保护模式。执行此代码后，无法使用BIOS
  *最后一个跳转代码将跳转到内核状态
  */
 
 protect_mode:
+    movw $0,%ax
+    movw %ax,%ds
     cli
     lgdt gdt_32
     in $0x92,%al
@@ -91,6 +135,13 @@ LONG_MODE:
     mov %ax,%ds
     mov %ax,%es
     mov %ax,%ss
+
+/*
+ * 判断是否需要开启64位模式
+ */
+    mov $0x00,%eax
+    cmp $x64,%eax
+    jnc Kernel
 /*
  * check一下cpuid功能
  */
@@ -161,6 +212,7 @@ LONG_MODE:
 /*
  *跳转至内核
  */
+Kernel:
     jmp 0x8200
 
     no_long_mode:
